@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Volume.h"
 #include "RTS_CameraBoundsVolume.generated.h"
-
 /*
  * Volume that restricts RTS camera movement.
  * RTS cameras are not allowed to move outside of this volume.

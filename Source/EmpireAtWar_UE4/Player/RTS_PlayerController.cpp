@@ -1,21 +1,16 @@
 #include "RTS_PlayerController.h"
-#include "RTS_CameraBoundsVolume.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
-void ARTS_PlayerController::BeginPlay()
+void ARTS_PlayerController::OnPossess(APawn* InPawn)
 {
-	Super::BeginPlay();
-
-	GetCameraPawnReference();
-}
-
-void ARTS_PlayerController::GetCameraPawnReference()
-{
-	PlayerPawn = Cast<ARTS_SpectatorPawn>(GetPawn());
+	Super::OnPossess(InPawn);
+	PlayerPawn = Cast<ARTS_SpectatorPawn>(InPawn);
 	//UE_LOG(LogTemp, Log, TEXT("%s"), *UKismetSystemLibrary::GetDisplayName(PlayerPawn));
 	if (!PlayerPawn)
 	{
-		UE_LOG(LogTemp, Log, TEXT("ERROR Cast failed: GetCameraPawnReference() in RTS_PlayerController."));
+		UE_LOG(LogTemp, Error, TEXT("ERROR Cast failed: GetCameraPawnReference() in RTS_PlayerController."));
+		return;
 	}
 }
 
@@ -23,18 +18,18 @@ void ARTS_PlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	// Enable mouse input	
-	bShowMouseCursor = true;
+	bShowMouseCursor = true; 
 	bEnableClickEvents = true;
 	bEnableMouseOverEvents = true;
-
 	// Enable camera movement
 	bIsMovementEnabled = true;
-
 	// Bind actions
+	InputComponent->BindAction(TEXT("Select"), IE_Pressed, this, &ARTS_PlayerController::StartSelectActors);
+	InputComponent->BindAction(TEXT("Select"), IE_Released, this, &ARTS_PlayerController::FinishSelectActors);
+
 	InputComponent->BindAxis(TEXT("MoveForward"),	this, &ARTS_PlayerController::MoveForward);
 	InputComponent->BindAxis(TEXT("MoveRight"),		this, &ARTS_PlayerController::MoveRight);
 	InputComponent->BindAxis(TEXT("ZoomCamera"),	this, &ARTS_PlayerController::ZoomCamera);
-
 	// Get camera bounds.
 	for (TActorIterator<ARTS_CameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -44,7 +39,7 @@ void ARTS_PlayerController::SetupInputComponent()
 
 	if (!CameraBoundsVolume)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No RTS_CameraBoundsVolume found. Camera will be able to move anywhere."));
+		UE_LOG(LogTemp, Warning, TEXT("No RTS_CameraBoundsVolume found. Free camera movement enabled."));
 	}
 }
 
@@ -63,7 +58,6 @@ void ARTS_PlayerController::UpdateCameraMovement(float DeltaTime)
 	ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 	ScrollBorderRight = ViewportSize.X - PlayerPawn->CameraScrollThreshold;
 	ScrollBorderTop = ViewportSize.Y - PlayerPawn->CameraScrollThreshold;
-
 	// Detect if cursor approach to the edge
 	if (GetMousePosition(MouseX, MouseY) && bIsMovementEnabled)
 	{
@@ -91,7 +85,6 @@ void ARTS_PlayerController::UpdateCameraMovement(float DeltaTime)
 	FVector Location = PlayerPawn->GetActorLocation();
 	Location += FVector::ForwardVector * PlayerPawn->CameraSpeed * PlayerPawn->CameraSpeedMultiplier * CameraForwardAxisValue * DeltaTime;
 	Location += FVector::RightVector * PlayerPawn->CameraSpeed * PlayerPawn->CameraSpeedMultiplier * CameraRightAxisValue * DeltaTime;
-
 	// Enforce camera bounds.
 	if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
 	{
@@ -127,4 +120,25 @@ void ARTS_PlayerController::MoveRight(float Value)
 void ARTS_PlayerController::ZoomCamera(float Value)
 {
 	PlayerPawn->DesiredCameraZoom = FMath::Clamp(PlayerPawn->DesiredCameraZoom + Value, PlayerPawn->MinCameraDistance, PlayerPawn->MaxCameraDistance);
+}
+
+void ARTS_PlayerController::StartSelectActors()
+{
+	StartPoint = GetCurrentMousePosition();
+	bCreatingSelectionFrame = true;
+}
+
+void ARTS_PlayerController::FinishSelectActors()
+{
+	bCreatingSelectionFrame = false;
+}
+
+FVector2D ARTS_PlayerController::GetCurrentMousePosition()
+{
+	float MouseX, MouseY;
+	if (GetMousePosition(MouseX, MouseY))
+	{
+		return FVector2D(MouseX, MouseY);
+	}
+	return FVector2D();
 }

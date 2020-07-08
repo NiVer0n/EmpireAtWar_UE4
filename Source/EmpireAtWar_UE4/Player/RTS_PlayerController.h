@@ -3,9 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "RTS_SpectatorPawn.h"
+#include "EmpireAtWar_UE4/Utils/RTS_CameraBoundsVolume.h"
 #include "RTS_PlayerController.generated.h"
-
-class ARTS_CameraBoundsVolume;
 
 UCLASS()
 class EMPIREATWAR_UE4_API ARTS_PlayerController : public APlayerController
@@ -13,20 +12,30 @@ class EMPIREATWAR_UE4_API ARTS_PlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	/* Whether currently creating a selection frame by dragging the mouse */
+	bool bCreatingSelectionFrame;
 
-	virtual void BeginPlay() override;
+	/* Initial mouse cursor location when pressing */
+	FVector2D StartPoint;
+
+	/* Last mouse cursor location when releasing */
+	FVector2D EndPoint;
 
 	virtual void PlayerTick(float DeltaTime) override;
 
+	/* Gets the current selection frame, in screen space */
+	UFUNCTION()
+	FVector2D GetCurrentMousePosition();
+
 protected:
+
+	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void SetupInputComponent() override;
 
-	void GetCameraPawnReference();
-
 private:
 
-	/* Volume that restricts the camera movement of this player. */
+	/* Volume that restricts the camera movement of this player */
 	UPROPERTY()
 	ARTS_CameraBoundsVolume* CameraBoundsVolume;
 
@@ -68,4 +77,12 @@ private:
 
 	/* Zoom input */
 	void ZoomCamera(float Value);
+
+	/* Remembers the current mouse position for multi-selection, finished by FinishSelectActors */
+	UFUNCTION()
+	void StartSelectActors();
+
+	/* Selects all selectable actors within the created selection frame, started by StartSelectActors */
+	UFUNCTION()
+	void FinishSelectActors();
 };
