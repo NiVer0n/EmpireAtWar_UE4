@@ -1,6 +1,8 @@
 #include "RTS_PlayerController.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/CollisionProfile.h"
+#include "EmpireAtWar_UE4/Components/ShipMovementComponent.h"
 
 void ARTS_PlayerController::OnPossess(APawn* InPawn)
 {
@@ -26,6 +28,8 @@ void ARTS_PlayerController::SetupInputComponent()
 	// Bind actions
 	InputComponent->BindAction(TEXT("Select"), IE_Pressed, this, &ARTS_PlayerController::StartSelectActors);
 	InputComponent->BindAction(TEXT("Select"), IE_Released, this, &ARTS_PlayerController::FinishSelectActors);
+	InputComponent->BindAction(TEXT("ExecuteOrder"), IE_Pressed, this, &ARTS_PlayerController::HandleOrder); /* 66 */
+	//InputComponent->BindAction(TEXT("ExecuteOrder"), IE_Released, this, &ARTS_PlayerController::FinishSelectActors);
 
 	InputComponent->BindAxis(TEXT("MoveForward"),	this, &ARTS_PlayerController::MoveForward);
 	InputComponent->BindAxis(TEXT("MoveRight"),		this, &ARTS_PlayerController::MoveRight);
@@ -131,6 +135,23 @@ void ARTS_PlayerController::StartSelectActors()
 void ARTS_PlayerController::FinishSelectActors()
 {
 	bCreatingSelectionFrame = false;
+}
+
+void ARTS_PlayerController::HandleOrder()
+{
+	FHitResult HitResult;
+	UCollisionProfile* CollisionProfile = UCollisionProfile::Get();
+	if (GetHitResultUnderCursorByChannel(CollisionProfile->ConvertToTraceType(ECC_Visibility), true, HitResult) && SelectedActors.Num() > 0)
+	{
+		for (AActor* SelectedActor : SelectedActors)
+		{
+			auto MovementComponent = SelectedActor->FindComponentByClass<UShipMovementComponent>();
+			if (MovementComponent)
+			{
+				MovementComponent->CommandMoveTo(HitResult.Location);
+			}
+		}
+	}
 }
 
 FVector2D ARTS_PlayerController::GetCurrentMousePosition()

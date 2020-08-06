@@ -43,6 +43,7 @@ void ARTS_HUD::DeselectActors()
 			if (SelectionComponent)
 			{
 				SelectionComponent->DeselectActor();
+				PlayerController->SelectedActors.Remove(SelectedActor);
 			}
 		}
 	}
@@ -58,6 +59,7 @@ void ARTS_HUD::SelectActors()
 			if (SelectionComponent)
 			{
 				SelectionComponent->SelectActor();
+				PlayerController->SelectedActors.AddUnique(SelectedActor);
 			}
 		}
 	}

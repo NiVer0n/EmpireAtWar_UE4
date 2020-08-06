@@ -21,6 +21,9 @@ public:
 	/* Last mouse cursor location when releasing */
 	FVector2D EndPoint;
 
+	/* Selected units */
+	TArray<AActor*> SelectedActors;
+
 	virtual void PlayerTick(float DeltaTime) override;
 
 	/* Gets the current selection frame, in screen space */
@@ -85,4 +88,8 @@ private:
 	/* Selects all selectable actors within the created selection frame, started by StartSelectActors */
 	UFUNCTION()
 	void FinishSelectActors();
+
+
+	UFUNCTION()
+	void HandleOrder();
 };
