@@ -10,7 +10,11 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"AIModule"
+				"AIModule",
+				"Slate",
+				"SlateCore",
+				"UMG",
+				"UMGEditor"
 			]
 		}
 	]

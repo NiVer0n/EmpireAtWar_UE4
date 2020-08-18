@@ -57,11 +57,14 @@ void USelectionComponent::SelectActor()
 		return;
 	}
 
-	bSelected = true;
-	// Update selection circle
-	if (IsValid(DecalComponent))
+	if (bCanBeSelected)
 	{
-		DecalComponent->SetHiddenInGame(false);
+		bSelected = true;
+		// Update selection circle
+		if (IsValid(DecalComponent))
+		{
+			DecalComponent->SetHiddenInGame(false);
+		}
 	}
 }
 
@@ -73,7 +76,7 @@ void USelectionComponent::DeselectActor()
 	}
 
 	bSelected = false;
-	// Update selection circles
+	// Update selection circle
 	if (IsValid(DecalComponent))
 	{
 		DecalComponent->SetHiddenInGame(true);
@@ -83,6 +86,11 @@ void USelectionComponent::DeselectActor()
 bool USelectionComponent::IsSelected() const
 {
 	return bSelected;
+}
+
+void USelectionComponent::SetCanBeSelected(bool CanBeSelected)
+{
+	bCanBeSelected = CanBeSelected;
 }
 
 int32 USelectionComponent::GetSelectionPriority() const

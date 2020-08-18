@@ -31,6 +31,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
+	/* Sets whether the unit can be selected */
+	UFUNCTION(BlueprintCallable)
+	void SetCanBeSelected(bool bCanBeSelected);
+
 	/* Gets the sort index for selected units */
 	UFUNCTION(BlueprintPure)
 	int32 GetSelectionPriority() const;
@@ -53,6 +57,9 @@ private:
 
 	/* Whether the unit is currently selected by the local player, or not */
 	bool bSelected;
+
+	/* Whether the unit can be selected */
+	bool bCanBeSelected = true;
 
 	/* Whether the unit is currently hovered by the local player, or not */
 	bool bHovered;
