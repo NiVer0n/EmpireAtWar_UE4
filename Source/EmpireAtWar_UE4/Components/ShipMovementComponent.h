@@ -11,18 +11,16 @@ class EMPIREATWAR_UE4_API UShipMovementComponent : public UFloatingPawnMovement
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	virtual void InitializeComponent() override;
-
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	/* Sets component's owner */
+	UFUNCTION(BlueprintCallable)
+	void SetOwner(AActor* ComponentOwner);
 
 	/* Move to desired point on map with calculation of correct and fastest path */
 	void CommandMoveTo(const FVector& Location);
 
 private:
-
-	/* Component owner */
+	
+	/* Component owner*/
 	AActor* Owner;
 
 	/* Location to move */
@@ -30,10 +28,6 @@ private:
 
 	/* Timer for launch rotation functionality */
 	FTimerHandle ShipRotationTimer;
-
-	/* Turn speed of ship */
-	UPROPERTY(EditAnywhere, Category = "MovementSettings", meta = (ClampMin = 0.1))
-	float TurnSpeed = 1.0f;
 
 	void SetShipRotation();
 };

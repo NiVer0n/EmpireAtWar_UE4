@@ -65,7 +65,7 @@ protected:
 
 	/* Max unit shields value */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health Settings", meta=(EditCondition="bHasShields"))
-	float MaxShields = 1.0f;
+	float MaxShields = 100.0f;
 
 	/* Max unit shields value */
 	UPROPERTY(BlueprintReadOnly)

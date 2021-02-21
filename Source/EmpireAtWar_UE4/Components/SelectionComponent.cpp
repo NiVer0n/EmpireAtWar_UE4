@@ -13,20 +13,14 @@ void USelectionComponent::BeginPlay()
 
 	AActor* Owner = GetOwner();
 
-	if (!IsValid(Owner))
-	{
-		return;
-	}
+	if (!IsValid(Owner)) return;
 
 	float DecalHeight = URTS_CollisionUtils::GetActorCollisionHeight(Owner);
 	float DecalRadius = URTS_CollisionUtils::GetActorCollisionSize(Owner);
 	// Create selection circle decal
 	DecalComponent = NewObject<UDecalComponent>(Owner, TEXT("SelectionCircleDecal"));
 
-	if (!DecalComponent)
-	{
-		return;
-	}
+	if (!DecalComponent) return;
 	// Set decal size
 	DecalComponent->RegisterComponent();
 	DecalComponent->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
@@ -52,10 +46,7 @@ void USelectionComponent::DestroyComponent(bool bPromoteChildren)
 
 void USelectionComponent::SelectActor()
 {
-	if (bSelected)
-	{
-		return;
-	}
+	if (bSelected) return;
 
 	if (bCanBeSelected)
 	{
@@ -70,10 +61,7 @@ void USelectionComponent::SelectActor()
 
 void USelectionComponent::DeselectActor()
 {
-	if (!bSelected)
-	{
-		return;
-	}
+	if (!bSelected) return;
 
 	bSelected = false;
 	// Update selection circle
